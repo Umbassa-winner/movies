@@ -30,10 +30,6 @@ class CustomRequester:
         """
         url = f"{self.base_url}{endpoint}"
 
-        # print(f"🔍 DEBUG send_request:")
-        # print(f"   self.headers = {self.headers}")
-        # print(f"   session.headers = {dict(self.session.headers)}")
-
         response = self.session.request(method, url, json=data, headers=self.headers)
         if need_logging:
             self.log_request_and_response(response)

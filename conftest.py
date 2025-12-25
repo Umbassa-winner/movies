@@ -101,7 +101,9 @@ def creds_super_admin():
 
 @pytest.fixture(scope="function")
 def data_for_filter():
-
+    """
+    Данные для фильтра
+    """
     min_price = DataGenerator.generate_movie_min_price()
     max_price = DataGenerator.generate_movie_max_price()
     return (min_price, max_price)
@@ -144,6 +146,10 @@ def created_movie(test_movie, api_manager, creds_super_admin):
 
 @pytest.fixture()
 def check_movie_for_delete(api_manager):
+    """
+    Проверка на существование фильма для DELETE
+    :param api_manager: Объект класса ApiManager
+    """
     def check(movie_id):
         response = api_manager.movies_api.get_movie(movie_id, 404)
         return response.status_code == 404
@@ -168,8 +174,79 @@ def clean_movie(api_manager):
         api_manager.movies_api.delete_movie(id)
     return cleaner
 
-"""
-=============================================LOGIN DATA================================================
+"""=========================================== MOVIE API NEGATIVE =============================================="""
+
+@pytest.fixture(scope="function")
+def negative_data_for_filter():
+    """
+    NEGATIVE данные для фильтра
+    """
+    neg_min_price = DataGenerator.generate_negative_movie_min_price()
+    neg_max_price = DataGenerator.generate_negative_movie_max_price()
+
+    return (neg_min_price, neg_max_price)
+
+@pytest.fixture(scope="function")
+def negative_test_movie_without_four_param():
+    """
+    NEGATIVE Генерация данных без некоторых полей
+    """
+    random_name = DataGenerator.generate_random_movie_name()
+    random_image_url = DataGenerator.generate_image_url()
+    random_price = DataGenerator.generate_movie_price()
+
+    return {
+        "name": random_name,
+        "imageUrl": random_image_url,
+        "price": random_price,
+    }
+
+@pytest.fixture(scope="function")
+def negative_test_movie_with_wrong_type_data():
+    """
+    NEGATIVE Генерация данных с некорректным типом данных для полей
+    """
+    random_name = DataGenerator.generate_random_movie_name()
+    random_image_url = DataGenerator.generate_negative_random_word()
+    random_price = DataGenerator.generate_negative_random_word()
+    random_description = DataGenerator.generate_movie_description()
+    random_location = DataGenerator.generate_negative_random_word()
+    random_published = DataGenerator.generate_movie_published()
+    random_genreid = DataGenerator.generate_movie_ganreid()
+
+    return {
+        "name": random_name,
+        "imageUrl": random_image_url,
+        "price": random_price,
+        "description": random_description,
+        "location": random_location,
+        "published": random_published,
+        "genreId": random_genreid
+    }
+
+@pytest.fixture(scope="function")
+def negative_test_movie_empty_json():
+    """
+    NEGATIVE Генерация данных
+    """
+    return {}
+
+
+# @pytest.fixture(scope="function")
+# def negative_created_movie(test_movie, api_manager, creds_super_admin):
+#     """
+#     NEGATIVE генерация корректных данных
+#     :param test_movie: Тестовые данные фильма
+#     :param api_manager: Объект класса ApiManager
+#     """
+#     login = api_manager.auth_api.authenticate(creds_super_admin)
+#     response = api_manager.movies_api.create_movie(test_movie)
+#     response_data = response.json()
+#     created_movie = test_movie.copy()
+#     created_movie["id"] = response_data["id"]
+#     return created_movie
+
+"""============================================LOGIN DATA================================================
 
 
 @pytest.fixture(scope="session")
