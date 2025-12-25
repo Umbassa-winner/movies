@@ -23,7 +23,7 @@ class AuthApi(CustomRequester):
             expected_status=expected_status
         )
 
-    def login_user(self, login_data, expected_status = 200):
+    def login_user(self, login_data, expected_status = 201):
         """
         Авторизация зарегистрированного пользователя
         :param login_data:

@@ -77,3 +77,7 @@ class DataGenerator:
     @staticmethod
     def generate_movie_min_price():
         return random.randint(1000, 4999)
+
+    @staticmethod
+    def generate_admin_creds():
+        return ("api1@gmail.com", "asdqwe123Q")

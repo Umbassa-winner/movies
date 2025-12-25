@@ -96,6 +96,7 @@ def creds_super_admin():
     """
     Возвращает кортеж из кредов для аутентификации как SUPER_ADMIN
     """
+    # return DataGenerator.generate_admin_creds()
     return ("api1@gmail.com", "asdqwe123Q")
 
 @pytest.fixture(scope="function")
@@ -147,6 +148,25 @@ def check_movie_for_delete(api_manager):
         response = api_manager.movies_api.get_movie(movie_id, 404)
         return response.status_code == 404
     return check
+
+@pytest.fixture(scope="function")
+def test_movie_for_patch():
+    """
+    Генератор данных для изменения фильма
+    """
+    random_name = DataGenerator.generate_random_movie_name()
+    random_description = DataGenerator.generate_movie_description()
+
+    return {
+        "name": random_name,
+        "description": random_description,
+    }
+
+@pytest.fixture(scope="function")
+def clean_movie(api_manager):
+    def cleaner (id):
+        api_manager.movies_api.delete_movie(id)
+    return cleaner
 
 """
 =============================================LOGIN DATA================================================
