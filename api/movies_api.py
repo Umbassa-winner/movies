@@ -29,11 +29,12 @@ class MoviesApi(CustomRequester):
         :param kwargs: передаваемые фильтры в формате ключ=значение. Пример: pageSize=10, page=1
         """
 
-        #Составляем строку из GET параметров, чтобы подставить ее в эндпоинт. Пример: pageSize=10&page=1&minPrice=1
+        #Составляем строку из GET параметров, чтобы подставить ее в эндпоинт.
         get_parameters = ""
         max = len(kwargs)
         count = 0
 
+        # Формируем строку формата "ключ=знач&ключ=знач&ключ=знач..."на неогр. число параметров
         for i, k in kwargs.items():
             together = f"{i}={str(k)}"
             get_parameters+=together
@@ -83,7 +84,7 @@ class MoviesApi(CustomRequester):
             expected_status=expected_status,
         )
 
-    def edit_movie(self, movie_id, edit_movie_data):
+    def edit_movie(self, movie_id, edit_movie_data, expected_status=200):
         """
         Редактирование конкретного фильма по ID
         :param movie_id: ID фильма
@@ -94,5 +95,6 @@ class MoviesApi(CustomRequester):
             method="PATCH",
             endpoint=f"{MOVIES_ENDPOINT}/{movie_id}",
             data=edit_movie_data,
+            expected_status=expected_status
 
         )

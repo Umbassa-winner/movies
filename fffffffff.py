@@ -1,18 +1,18 @@
-mass = {'movies':[{"price": 1}, {"price": 2}, {"price": 3}]}
+# from faker import Faker
+#
+# faker = Faker()
+#
+# def generate_random_word():
+#     return faker.word()
+#
+# print(type(generate_random_word()))
+#
+import requests
 
-min = 1
-max = 4
-avg = 2
+import json
 
-# assert response_data["movies"][0]["price"] >= data_for_filter[0]
+json_string = '{"name": "Soldier face", "imageUrl": "https://www.wiggins.com/", "price": 10120, "description": "This movie about such traditional plan tree.", "location": "SPB", "published": false, "genreId": 7}'
 
-# for i in m["movies"]:
-#     print(i)
-
-assert all(i["price"] >= min for i in mass["movies"]), "Фильтр не работает"
-assert all(i["price"] <= max for i in mass["movies"]), "Фильтр не работает"
-i
-
-
-
-
+movie_dict = json.loads(json_string)
+print(movie_dict)
+print(type(movie_dict))  # <class 'dict'>

@@ -1,5 +1,6 @@
 import requests
 import pytest
+
 from utils.data_generator import DataGenerator
 from api.api_manager import ApiManager
 # from constants import REGISTER_ENDPOINT, BASE_URL
@@ -68,7 +69,7 @@ def creds_user (test_user):
     """
     :return: возвращает кортеж из кредов для аутентификации в качестве USER
     """
-    return (test_user["email"], test_user["password"])
+    return test_user["email"], test_user["password"]
 
 @pytest.fixture(scope="function")
 def user_id (registered_user):
@@ -97,14 +98,16 @@ def creds_super_admin():
     Возвращает кортеж из кредов для аутентификации как SUPER_ADMIN
     """
     # return DataGenerator.generate_admin_creds()
-    return ("api1@gmail.com", "asdqwe123Q")
+    return "api1@gmail.com", "asdqwe123Q"
 
 @pytest.fixture(scope="function")
 def data_for_filter():
-
+    """
+    Данные для фильтра
+    """
     min_price = DataGenerator.generate_movie_min_price()
     max_price = DataGenerator.generate_movie_max_price()
-    return (min_price, max_price)
+    return min_price, max_price
 
 @pytest.fixture(scope="function")
 def test_movie():
@@ -117,7 +120,7 @@ def test_movie():
     random_description = DataGenerator.generate_movie_description()
     random_location = DataGenerator.generate_movie_location()
     random_published = DataGenerator.generate_movie_published()
-    random_genreId = DataGenerator.generate_movie_ganreid()
+    random_genreid = DataGenerator.generate_movie_ganreid()
 
     return {
         "name": random_name,
@@ -126,7 +129,7 @@ def test_movie():
         "description": random_description,
         "location": random_location,
         "published": random_published,
-        "genreId": random_genreId
+        "genreId": random_genreid
     }
 
 @pytest.fixture(scope="function")
@@ -135,7 +138,7 @@ def created_movie(test_movie, api_manager, creds_super_admin):
     :param test_movie: Тестовые данные фильма
     :param api_manager: Объект класса ApiManager
     """
-    login = api_manager.auth_api.authenticate(creds_super_admin)
+    api_manager.auth_api.authenticate(creds_super_admin)
     response = api_manager.movies_api.create_movie(test_movie)
     response_data = response.json()
     created_movie = test_movie.copy()
@@ -144,6 +147,10 @@ def created_movie(test_movie, api_manager, creds_super_admin):
 
 @pytest.fixture()
 def check_movie_for_delete(api_manager):
+    """
+    Проверка на существование фильма для DELETE
+    :param api_manager: Объект класса ApiManager
+    """
     def check(movie_id):
         response = api_manager.movies_api.get_movie(movie_id, 404)
         return response.status_code == 404
@@ -164,59 +171,80 @@ def test_movie_for_patch():
 
 @pytest.fixture(scope="function")
 def clean_movie(api_manager):
-    def cleaner (id):
-        api_manager.movies_api.delete_movie(id)
+    def cleaner (value_id):
+        api_manager.movies_api.delete_movie(value_id)
     return cleaner
 
-"""
-=============================================LOGIN DATA================================================
+"""=========================================== MOVIE API NEGATIVE =============================================="""
 
+@pytest.fixture(scope="function")
+def negative_data_for_filter():
+    """
+    NEGATIVE данные для фильтра
+    """
+    neg_min_price = DataGenerator.generate_negative_movie_min_price()
+    neg_max_price = DataGenerator.generate_negative_movie_max_price()
 
-@pytest.fixture(scope="session")
-def user_login_data (test_user):
+    return neg_min_price, neg_max_price
 
-    return {
-        "email": test_user["email"],
-        "password": test_user["password"]
-    }
-
-
-================================================NEGATIVE===================================================
-
-
-@pytest.fixture(scope="session")
-def negative_user_login_data_password(test_user):
-
-    return {
-        "email": test_user["email"],
-        "password": 123
-    }
-
-@pytest.fixture(scope="session")
-def negative_user_login_data_email(test_user):
+@pytest.fixture(scope="function")
+def negative_test_movie_without_four_param():
+    """
+    NEGATIVE Генерация данных без некоторых полей
+    """
+    random_name = DataGenerator.generate_random_movie_name()
+    random_image_url = DataGenerator.generate_image_url()
+    random_price = DataGenerator.generate_movie_price()
 
     return {
-        "email": test_user["email"] + 'KEK',
-        "password": test_user["password"]
+        "name": random_name,
+        "imageUrl": random_image_url,
+        "price": random_price,
     }
-@pytest.fixture(scope="session")
-def negative_user_login_data_empty_body_request(test_user):
 
+@pytest.fixture(scope="function")
+def negative_test_movie_with_wrong_type_data():
+    """
+    NEGATIVE Генерация данных с некорректным типом данных для полей
+    """
+    random_name = DataGenerator.generate_random_movie_name()
+    random_image_url = DataGenerator.generate_negative_random_word()
+    random_price = DataGenerator.generate_negative_random_word()
+    random_description = DataGenerator.generate_movie_description()
+    random_location = DataGenerator.generate_negative_random_word()
+    random_published = DataGenerator.generate_movie_published()
+    random_genreid = DataGenerator.generate_movie_ganreid()
+
+    return {
+        "name": random_name,
+        "imageUrl": random_image_url,
+        "price": random_price,
+        "description": random_description,
+        "location": random_location,
+        "published": random_published,
+        "genreId": random_genreid
+    }
+
+@pytest.fixture(scope="function")
+def negative_test_movie_empty_json():
+    """
+    NEGATIVE Пустой джейсон
+    """
     return {}
 
-"""
+@pytest.fixture(scope="function")
+def negative_id():
+    """
+    NEGATIVE неверный айди для get теста
+    """
+    random_id = DataGenerator.generate_negative_random_id()
+    return random_id
 
-"""===================================== НЕАКТУАЛЬНО  ======================================"""
+@pytest.fixture(scope="function")
+def login_and_auth(api_manager, creds_super_admin):
+    api_manager.auth_api.authenticate(creds_super_admin)
 
+@pytest.fixture(scope="function")
+def clear_headers(api_manager):
+    api_manager.session.headers.clear()
 
-"""
-
-@pytest.fixture(scope='session')
-def requester():
-
-    # Фикстура для создания кастомного реквестера
-
-    session = requests.Session()
-    return CustomRequester(session=session, base_url=BASE_URL)
-
-"""

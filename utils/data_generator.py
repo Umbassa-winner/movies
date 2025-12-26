@@ -5,6 +5,8 @@ from faker import Faker
 faker = Faker()
 class DataGenerator:
 
+# """ ============================== API AUTH ================================== """
+
     @staticmethod
     def generate_random_email():
         random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
@@ -40,6 +42,8 @@ class DataGenerator:
         random.shuffle(password)
 
         return ''.join(password)
+
+# """ ============================== API MOVIES  ================================== """
 
     @staticmethod
     def generate_random_movie_name():
@@ -81,3 +85,19 @@ class DataGenerator:
     @staticmethod
     def generate_admin_creds():
         return ("api1@gmail.com", "asdqwe123Q")
+
+    @staticmethod
+    def generate_negative_movie_max_price():
+        return faker.name()
+
+    @staticmethod
+    def generate_negative_movie_min_price():
+        return faker.name()
+
+    @staticmethod
+    def generate_negative_random_word():
+        return faker.word()
+
+    @staticmethod
+    def generate_negative_random_id():
+        return faker.random_int(800000000, 900000000)

@@ -5,7 +5,7 @@ class TestPositiveMoviesApi:
     def test_get_movie_list(self, api_manager:ApiManager):
 
         """
-        Тест на получение списка фильмов
+        Позитивный тест на получение списка фильмов
         """
 
         response = api_manager.movies_api.get_movies_list()
@@ -17,7 +17,7 @@ class TestPositiveMoviesApi:
     def test_get_movie_list_with_parameters(self, api_manager:ApiManager, data_for_filter):
 
         """
-        Тест на получение списка фильмов с ФИЛЬТРАМИ по цене
+        Позитивный тест на получение списка фильмов с ФИЛЬТРАМИ по цене
         """
 
         response = api_manager.movies_api.test_get_movies_list_with_parameters(minPrice=data_for_filter[0], maxPrice=data_for_filter[1])
@@ -30,7 +30,7 @@ class TestPositiveMoviesApi:
     def test_create_movie(self, api_manager:ApiManager, test_movie, creds_super_admin, clean_movie):
 
         """
-        Тест на создание фильма
+        Позитивный тест на создание фильма
         """
 
         login = api_manager.auth_api.authenticate(creds_super_admin)
@@ -47,7 +47,7 @@ class TestPositiveMoviesApi:
     def test_get_movie(self, api_manager, created_movie, clean_movie):
 
         """
-        Тест на получение фильма по АЙДИ
+        Позитивный тест на получение фильма по АЙДИ
         """
 
         response = api_manager.movies_api.get_movie(created_movie["id"])
@@ -63,7 +63,7 @@ class TestPositiveMoviesApi:
     def test_delete_movie(self, api_manager, created_movie, check_movie_for_delete):
 
         """
-        Тест на удаление фильма
+        Позитивный тест на удаление фильма
         """
 
         response = api_manager.movies_api.delete_movie(created_movie["id"])
@@ -74,7 +74,7 @@ class TestPositiveMoviesApi:
     def test_patch_movie(self, api_manager, created_movie, test_movie_for_patch, clean_movie):
 
         """
-        Тест на изменение фильма
+        Позитивный тест на изменение фильма
         """
 
         response = api_manager.movies_api.edit_movie(created_movie["id"], test_movie_for_patch)
