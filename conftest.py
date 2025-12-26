@@ -1,5 +1,6 @@
 import requests
 import pytest
+
 from utils.data_generator import DataGenerator
 from api.api_manager import ApiManager
 # from constants import REGISTER_ENDPOINT, BASE_URL
@@ -68,7 +69,7 @@ def creds_user (test_user):
     """
     :return: возвращает кортеж из кредов для аутентификации в качестве USER
     """
-    return (test_user["email"], test_user["password"])
+    return test_user["email"], test_user["password"]
 
 @pytest.fixture(scope="function")
 def user_id (registered_user):
@@ -97,7 +98,7 @@ def creds_super_admin():
     Возвращает кортеж из кредов для аутентификации как SUPER_ADMIN
     """
     # return DataGenerator.generate_admin_creds()
-    return ("api1@gmail.com", "asdqwe123Q")
+    return "api1@gmail.com", "asdqwe123Q"
 
 @pytest.fixture(scope="function")
 def data_for_filter():
@@ -106,7 +107,7 @@ def data_for_filter():
     """
     min_price = DataGenerator.generate_movie_min_price()
     max_price = DataGenerator.generate_movie_max_price()
-    return (min_price, max_price)
+    return min_price, max_price
 
 @pytest.fixture(scope="function")
 def test_movie():
@@ -119,7 +120,7 @@ def test_movie():
     random_description = DataGenerator.generate_movie_description()
     random_location = DataGenerator.generate_movie_location()
     random_published = DataGenerator.generate_movie_published()
-    random_genreId = DataGenerator.generate_movie_ganreid()
+    random_genreid = DataGenerator.generate_movie_ganreid()
 
     return {
         "name": random_name,
@@ -128,7 +129,7 @@ def test_movie():
         "description": random_description,
         "location": random_location,
         "published": random_published,
-        "genreId": random_genreId
+        "genreId": random_genreid
     }
 
 @pytest.fixture(scope="function")
@@ -137,7 +138,7 @@ def created_movie(test_movie, api_manager, creds_super_admin):
     :param test_movie: Тестовые данные фильма
     :param api_manager: Объект класса ApiManager
     """
-    login = api_manager.auth_api.authenticate(creds_super_admin)
+    api_manager.auth_api.authenticate(creds_super_admin)
     response = api_manager.movies_api.create_movie(test_movie)
     response_data = response.json()
     created_movie = test_movie.copy()
@@ -170,8 +171,8 @@ def test_movie_for_patch():
 
 @pytest.fixture(scope="function")
 def clean_movie(api_manager):
-    def cleaner (id):
-        api_manager.movies_api.delete_movie(id)
+    def cleaner (value_id):
+        api_manager.movies_api.delete_movie(value_id)
     return cleaner
 
 """=========================================== MOVIE API NEGATIVE =============================================="""
@@ -184,7 +185,7 @@ def negative_data_for_filter():
     neg_min_price = DataGenerator.generate_negative_movie_min_price()
     neg_max_price = DataGenerator.generate_negative_movie_max_price()
 
-    return (neg_min_price, neg_max_price)
+    return neg_min_price, neg_max_price
 
 @pytest.fixture(scope="function")
 def negative_test_movie_without_four_param():
@@ -243,54 +244,7 @@ def negative_id():
 def login_and_auth(api_manager, creds_super_admin):
     api_manager.auth_api.authenticate(creds_super_admin)
 
-"""============================================LOGIN DATA================================================
+@pytest.fixture(scope="function")
+def clear_headers(api_manager):
+    api_manager.session.headers.clear()
 
-
-@pytest.fixture(scope="session")
-def user_login_data (test_user):
-
-    return {
-        "email": test_user["email"],
-        "password": test_user["password"]
-    }
-
-
-================================================NEGATIVE===================================================
-
-
-@pytest.fixture(scope="session")
-def negative_user_login_data_password(test_user):
-
-    return {
-        "email": test_user["email"],
-        "password": 123
-    }
-
-@pytest.fixture(scope="session")
-def negative_user_login_data_email(test_user):
-
-    return {
-        "email": test_user["email"] + 'KEK',
-        "password": test_user["password"]
-    }
-@pytest.fixture(scope="session")
-def negative_user_login_data_empty_body_request(test_user):
-
-    return {}
-
-"""
-
-"""===================================== НЕАКТУАЛЬНО  ======================================"""
-
-
-"""
-
-@pytest.fixture(scope='session')
-def requester():
-
-    # Фикстура для создания кастомного реквестера
-
-    session = requests.Session()
-    return CustomRequester(session=session, base_url=BASE_URL)
-
-"""

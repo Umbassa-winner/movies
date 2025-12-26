@@ -14,9 +14,9 @@ class TestPositiveMoviesApi:
 
         assert response.status_code == 400, "Неверный статус код"
         assert "message" in response.text, "Отсутствует сообщение об ошибке"
-        assert response_data["message"][0] == "Поле minPrice имеет минимальную величину 1", "Отсутствует сообщение об ошибке minPrice_мин.велечина_1"
+        assert response_data["message"][0] == "Поле minPrice имеет минимальную величину 1", "Отсутствует сообщение об ошибке minPrice_мин.величина_1"
         assert response_data["message"][1] == "Поле minPrice должно быть числом", "Отсутствует сообщение об ошибке minPrice_число"
-        assert response_data["message"][2] == "Поле minPrice имеет минимальную величину 1", "Отсутствует сообщение об ошибке minPrice_мин.велечина_2"
+        assert response_data["message"][2] == "Поле minPrice имеет минимальную величину 1", "Отсутствует сообщение об ошибке minPrice_мин.величина_2"
 
 
     def test_negative_create_movie_without_four_param(self, api_manager:ApiManager, negative_test_movie_without_four_param, creds_super_admin):
@@ -68,7 +68,7 @@ class TestPositiveMoviesApi:
         request_from_response_wrong_data = json.loads(response_with_error.request.body.decode('utf-8'))
 
         assert "message" in response_with_error.text, "Отсутствует сообщение об ошибке"
-        assert response_data["name"] == request_from_response_wrong_data["name"], "Имена у фильмов не совпадают. Ошибка вывыводится некорректно"
+        assert response_data["name"] == request_from_response_wrong_data["name"], "Имена у фильмов не совпадают. Ошибка выводится некорректно"
 
         # Подчищаем данные
         clean_movie(response_data["id"])
@@ -84,19 +84,17 @@ class TestPositiveMoviesApi:
 
         assert "message" in response_data, "Отсутствует сообщение об ошибке"
 
-    #Если запускать одним тестом, все збс, если вместе со всеми, то крашится т.к.
-    # передается токен в хедерах от других тестов.
 
-    # def test_negative_delete_movie_without_token(self, api_manager, negative_id):
-    #
-    #     """
-    #     Негативный тест на удаление фильма без авторизации
-    #     """
-    #
-    #     response = api_manager.movies_api.delete_movie(negative_id, 401)
-    #     response_data = response.json()
-    #
-    #     assert "message" in response_data, "Отсутствует сообщение об ошибке"
+    def test_negative_delete_movie_without_token(self, api_manager, negative_id, clear_headers):
+
+        """
+        Негативный тест на удаление фильма без авторизации
+        """
+
+        response = api_manager.movies_api.delete_movie(negative_id, 401)
+        response_data = response.json()
+
+        assert "message" in response_data, "Отсутствует сообщение об ошибке"
 
     def test_negative_delete_movie_with_wrong_id(self, api_manager, login_and_auth, negative_id):
 
