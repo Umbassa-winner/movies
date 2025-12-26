@@ -97,3 +97,7 @@ class DataGenerator:
     @staticmethod
     def generate_negative_random_word():
         return faker.word()
+
+    @staticmethod
+    def generate_negative_random_id():
+        return faker.random_int(800000000, 900000000)

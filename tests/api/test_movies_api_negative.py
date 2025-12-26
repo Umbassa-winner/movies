@@ -1,4 +1,5 @@
 from api.api_manager import ApiManager
+import json
 
 class TestPositiveMoviesApi:
 
@@ -51,7 +52,7 @@ class TestPositiveMoviesApi:
 
         assert "message" in response.text, "Отсутствует сообщение об ошибке"
 
-    def test_negative_double_create_movie(self, api_manager:ApiManager, test_movie, creds_super_admin, clean_movie):
+    def test_negative_create_double_movie(self, api_manager:ApiManager, test_movie, creds_super_admin, clean_movie):
 
         """
         Негативный тест на создание 2-го фильма с аналогичными данными
@@ -59,50 +60,73 @@ class TestPositiveMoviesApi:
 
         login = api_manager.auth_api.authenticate(creds_super_admin)
         response = api_manager.movies_api.create_movie(test_movie)
-        response_wrong = api_manager.movies_api.create_movie(test_movie, 409)
+        response_with_error = api_manager.movies_api.create_movie(test_movie, 409)
+        response_data = response.json()
 
-        # response_data = response.json()
-        # request_from_response_wrong_data = response_wrong.request.body
-        #
-        # # assert "message" in response.text, "Отсутствует сообщение об ошибке"
-        # assert response_data["name"] == test_movie["name"], "Имена у фильмов не совпадают. Ошибка выходит некорректно"
-        #
-        # # Подчищаем данные
-        # clean_movie(response_data["id"])
+        #Декодируем байтовые данные из request.body в чпн символы с помощью .decode('utf-8')
+        #Используем модуль json, чтобы преобразовать строку вида '{"key":"value"}' в dict
+        request_from_response_wrong_data = json.loads(response_with_error.request.body.decode('utf-8'))
 
-    # def test_negative_get_movie(self, api_manager, created_movie):
+        assert "message" in response_with_error.text, "Отсутствует сообщение об ошибке"
+        assert response_data["name"] == request_from_response_wrong_data["name"], "Имена у фильмов не совпадают. Ошибка вывыводится некорректно"
+
+        # Подчищаем данные
+        clean_movie(response_data["id"])
+
+    def test_negative_get_movie_with_fake_id(self, api_manager, negative_id):
+
+        """
+        Негативный тест на получение фильма по АЙДИ
+        """
+
+        response = api_manager.movies_api.get_movie(negative_id, 404)
+        response_data = response.json()
+
+        assert "message" in response_data, "Отсутствует сообщение об ошибке"
+
+    #Если запускать одним тестом, все збс, если вместе со всеми, то крашится т.к.
+    # передается токен в хедерах от других тестов.
+
+    # def test_negative_delete_movie_without_token(self, api_manager, negative_id):
     #
     #     """
-    #     Негативный тест на получение фильма по АЙДИ
+    #     Негативный тест на удаление фильма без авторизации
     #     """
     #
-    #     response = api_manager.movies_api.get_movie(created_movie["id"])
+    #     response = api_manager.movies_api.delete_movie(negative_id, 401)
     #     response_data = response.json()
     #
-    #     assert "reviews" in response_data, "Отзывы фильма отсутствуют"
-    #     assert created_movie["location"] == response_data["location"], "Локация фильма не совпадает"
-    #     assert created_movie["published"] == response_data["published"], "Опубликованность фильма не совпадает"
-    #
-    #
-    # def test_negative_delete_movie(self, api_manager, created_movie, check_movie_for_delete):
-    #
-    #     """
-    #     Негативный тест на удаление фильма
-    #     """
-    #
-    #     response = api_manager.movies_api.delete_movie(created_movie["id"])
-    #     response_data = response.json()
-    #
-    #     assert check_movie_for_delete(created_movie["id"]), "Фильм не удалился"
-    #
-    # def test_negative_patch_movie(self, api_manager, created_movie, test_movie_for_patch):
-    #
-    #     """
-    #     Негативный тест на изменение фильма
-    #     """
-    #
-    #     response = api_manager.movies_api.edit_movie(created_movie["id"], test_movie_for_patch)
-    #     response_data = response.json()
-    #
-    #     assert test_movie_for_patch["name"] == response_data["name"], "Имя не изменилось"
-    #     assert test_movie_for_patch["description"] == response_data["description"], "Имя не изменилось"
+    #     assert "message" in response_data, "Отсутствует сообщение об ошибке"
+
+    def test_negative_delete_movie_with_wrong_id(self, api_manager, login_and_auth, negative_id):
+
+        """
+        Негативный тест на удаление несуществующего фильма
+        """
+
+        response = api_manager.movies_api.delete_movie(negative_id, 404)
+        response_data = response.json()
+
+        assert "message" in response_data, "Отсутствует сообщение об ошибке"
+
+    def test_negative_patch_movie_with_wrong_data(self, api_manager, created_movie, negative_test_movie_with_wrong_type_data):
+
+        """
+        Негативный тест на изменение фильма
+        """
+
+        response = api_manager.movies_api.edit_movie(created_movie["id"], negative_test_movie_with_wrong_type_data, 400)
+        response_data = response.json()
+
+        assert "message" in response_data, "Отсутствует сообщение об ошибке"
+
+    def test_negative_patch_movie_with_wrong_id(self, api_manager, created_movie, negative_id, test_movie_for_patch):
+        """
+        Негативный тест на изменение фильма
+        """
+
+        response = api_manager.movies_api.edit_movie(negative_id, test_movie_for_patch, 404)
+        response_data = response.json()
+
+        assert "message" in response_data, "Отсутствует сообщение об ошибке"
+

@@ -84,7 +84,7 @@ class MoviesApi(CustomRequester):
             expected_status=expected_status,
         )
 
-    def edit_movie(self, movie_id, edit_movie_data):
+    def edit_movie(self, movie_id, edit_movie_data, expected_status=200):
         """
         Редактирование конкретного фильма по ID
         :param movie_id: ID фильма
@@ -95,5 +95,6 @@ class MoviesApi(CustomRequester):
             method="PATCH",
             endpoint=f"{MOVIES_ENDPOINT}/{movie_id}",
             data=edit_movie_data,
+            expected_status=expected_status
 
         )

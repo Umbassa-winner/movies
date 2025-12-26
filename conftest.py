@@ -227,24 +227,21 @@ def negative_test_movie_with_wrong_type_data():
 @pytest.fixture(scope="function")
 def negative_test_movie_empty_json():
     """
-    NEGATIVE Генерация данных
+    NEGATIVE Пустой джейсон
     """
     return {}
 
+@pytest.fixture(scope="function")
+def negative_id():
+    """
+    NEGATIVE неверный айди для get теста
+    """
+    random_id = DataGenerator.generate_negative_random_id()
+    return random_id
 
-# @pytest.fixture(scope="function")
-# def negative_created_movie(test_movie, api_manager, creds_super_admin):
-#     """
-#     NEGATIVE генерация корректных данных
-#     :param test_movie: Тестовые данные фильма
-#     :param api_manager: Объект класса ApiManager
-#     """
-#     login = api_manager.auth_api.authenticate(creds_super_admin)
-#     response = api_manager.movies_api.create_movie(test_movie)
-#     response_data = response.json()
-#     created_movie = test_movie.copy()
-#     created_movie["id"] = response_data["id"]
-#     return created_movie
+@pytest.fixture(scope="function")
+def login_and_auth(api_manager, creds_super_admin):
+    api_manager.auth_api.authenticate(creds_super_admin)
 
 """============================================LOGIN DATA================================================
 
